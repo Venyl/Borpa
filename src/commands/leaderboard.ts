@@ -31,13 +31,23 @@ export async function execute(interaction: CommandInteraction, client: Client) {
     for await (const user of dbUsers!) {
         const dcUser = await client.users.fetch(user.get('userId'));
         const xp: number = user.get('xp');
+        let actualLvlXp = 0;
+        for (let i = 1; i < Number(user.get('level')); i++) {
+            actualLvlXp += 10 + 50 ** Math.log10(i);
+        }
+        console.log(actualLvlXp);
+
         const overallNeededXp: number = user.get('overallNeededXp');
         ctx.textAlign = 'left';
         ctx.fillText(dcUser.username, 130, yOffset);
         ctx.textAlign = 'right';
         ctx.fillText(String(user.get('level')), 580, yOffset);
         ctx.fillText(`${xp} / ${overallNeededXp}`, 885, yOffset);
-        ctx.fillText(`${Math.floor((xp / overallNeededXp) * 100)}%`, 1000, yOffset);
+        ctx.fillText(
+            `${Math.floor(((xp - actualLvlXp) / (overallNeededXp - actualLvlXp)) * 100)}%`,
+            1000,
+            yOffset
+        );
         yOffset += 50;
     }
 

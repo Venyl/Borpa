@@ -12,6 +12,7 @@ export interface User {
 
 export default async function updateUser(userId: string, message: string) {
     try {
+        // if (userId === '338768062415372291') return;
         const docRef = doc(db, 'users', userId);
         const userDoc = await getDoc(docRef);
         const userLastUpdate: number = userDoc.get('lastUpdated').seconds;
@@ -30,12 +31,12 @@ export default async function updateUser(userId: string, message: string) {
         let i = newXp;
         let c = 0;
         while (i > 0) {
-            let xpForNextLvl = 10 + 200 ** Math.log10(c++);
+            let xpForNextLvl = 10 + 50 ** Math.log10(c++);
             i -= xpForNextLvl;
             overallNeededXp += xpForNextLvl;
             if (i >= 0) userLevel++;
         }
-        if (overallNeededXp === newXp) overallNeededXp += 10 + 200 ** Math.log10(userLevel);
+        if (overallNeededXp === newXp) overallNeededXp += 10 + 50 ** Math.log10(userLevel);
         overallNeededXp = Math.ceil(overallNeededXp);
         userXp = newXp;
         const remainingXp = overallNeededXp - userXp;
