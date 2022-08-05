@@ -39,6 +39,20 @@ client.on('messageCreate', async message => {
     if (message.author.bot) return;
     await addUser(message.author.id);
     await updateUser(message.author.id, message.content);
+    // for await (const id of [
+    //     '219102395752382465',
+    //     '229592167285391360',
+    //     '257122181962661888',
+    //     '273830402022572032',
+    //     '338768062415372291',
+    //     '344897472927105025',
+    //     '596820414110629911',
+    //     '621015093815148550',
+    //     '802660323911401482',
+    //     '846478860157190176',
+    // ]) {
+    //     await updateUser(id, 'a');
+    // }
 });
 
 client.login(config.DISCORD_TOKEN);

@@ -11,7 +11,7 @@ export const data = new SlashCommandBuilder()
 export async function execute(interaction: CommandInteraction, client: Client) {
     if (!interaction.channelId) return;
     if (!interaction.isChatInputCommand()) return;
-
+    interaction.deferReply();
     const canvas = createCanvas(1080, 1080);
     GlobalFonts.registerFromPath('src/assets/fonts/NotoSans-CondensedLight.ttf', 'Noto Sans');
     const ctx = canvas.getContext('2d');
@@ -24,10 +24,10 @@ export async function execute(interaction: CommandInteraction, client: Client) {
 
     background.src = backgroundFile;
     ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
-
     const dbUsers = await fetchAllUsers();
     dbUsers?.sort((a, b) => Number(b.get('xp')) - Number(a.get('xp')));
     let yOffset = 115;
+
     for await (const user of dbUsers!) {
         const dcUser = await client.users.fetch(user.get('userId'));
         const xp: number = user.get('xp');
@@ -35,8 +35,6 @@ export async function execute(interaction: CommandInteraction, client: Client) {
         for (let i = 1; i < Number(user.get('level')); i++) {
             actualLvlXp += 10 + 50 ** Math.log10(i);
         }
-        console.log(actualLvlXp);
-
         const overallNeededXp: number = user.get('overallNeededXp');
         ctx.textAlign = 'left';
         ctx.fillText(dcUser.username, 130, yOffset);
@@ -44,7 +42,7 @@ export async function execute(interaction: CommandInteraction, client: Client) {
         ctx.fillText(String(user.get('level')), 580, yOffset);
         ctx.fillText(`${xp} / ${overallNeededXp}`, 885, yOffset);
         ctx.fillText(
-            `${Math.floor(((xp - actualLvlXp) / (overallNeededXp - actualLvlXp)) * 100)}%`,
+            `${Math.floor(((xp - actualLvlXp) / (overallNeededXp - actualLvlXp)) * 100)}`,
             1000,
             yOffset
         );
@@ -52,6 +50,7 @@ export async function execute(interaction: CommandInteraction, client: Client) {
     }
 
     const attachment = new AttachmentBuilder(canvas.toBuffer('image/png'), { name: 'table.png' });
+
     const exampleEmbed = new EmbedBuilder()
         .setColor(0x22aa4d)
         .setTitle("Your server's leaderboard")
@@ -63,5 +62,5 @@ export async function execute(interaction: CommandInteraction, client: Client) {
                 'https://cdn.discordapp.com/avatars/997843453662736444/777ee7499d7345378b464a1c18d3739e.webp?size=80',
         });
 
-    return interaction.reply({ embeds: [exampleEmbed], files: [attachment] });
+    return interaction.editReply({ embeds: [exampleEmbed], files: [attachment] });
 }
